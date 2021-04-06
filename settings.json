@@ -1,0 +1,9 @@
+{
+    "tokenid":"insert",
+    "botprefix":"p!",
+    "turnOnTwitterIFTTT":"True",
+    "twitterAddress":"https://twitter.com/pangolindex",
+    "turnOnGitIFTTT":"True",
+    "gitAddress":"https://github.com/pangolindex/pangolin.exchange",
+    "refreshTokenList":60000
+}
