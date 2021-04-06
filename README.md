@@ -1,5 +1,4 @@
-# PangoBot
-# Version 0.1 (in development).
+# PangoBot Version 0.1 (in development).
 
 Open Source discord bot for showing useful information in general about Pangolin Exchange.
 
