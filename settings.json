@@ -2,8 +2,11 @@
     "tokenid":"insert",
     "botprefix":"p!",
     "turnOnTwitterIFTTT":"True",
+    "twitterChannel":"829130975438569472",
     "twitterAddress":"https://twitter.com/pangolindex",
     "turnOnGitIFTTT":"True",
+    "gitChannel":"829130955931385876",
     "gitAddress":"https://github.com/pangolindex/pangolin.exchange",
-    "refreshTokenList":60000
+    "refreshTokenList":60000,
+    "cooldownMessage":4000
 }
