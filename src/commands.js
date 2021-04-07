@@ -6,7 +6,7 @@ const pangoColor = 15105570;
 
 
 function runCommand(command,msg,settings){
-    if(checkCooldown(msg.guild.id,command,settings.cooldownMessage)){
+    if(checkCooldown(msg,command.ReportedCommand,settings.cooldownMessage)){
         switch (command.ReportedCommand){
             case 'help':
                 msg.channel.send(makeEmbed({

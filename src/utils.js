@@ -20,15 +20,15 @@ function checkCommand(str){
     return {ValidCommand:hasCommand,ReportedCommand:reportedCommand};
 }
 
-function checkCooldown(guild, command, channel, cooldownMessage) {
-    if (cooldownSet.has(guild + command.ReportedCommand)) {
-        channel.send('This command is in cooldown, wait a little.').then(message =>
-            message.delete(cooldownMessage));
+function checkCooldown(msg, command, cooldownMessage) {
+    if (cooldownSet.has(msg.guild.id + command)) {
+        msg.channel.send('This command is in cooldown, wait a little.').then(message =>
+            message.delete({timeout:cooldownMessage}));
         return false;
     } else {
-        cooldownSet.add(guild + command.ReportedCommand);
+        cooldownSet.add(msg.guild.id + command);
         setTimeout(() => {
-            cooldownSet.delete(guild + command.ReportedCommand);
+            cooldownSet.delete(msg.guild.id + command);
         }, cooldownMessage+1000);
         return true;
     }
