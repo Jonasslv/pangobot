@@ -24,15 +24,18 @@ client.on('message', msg => {
   //Store the content/text of the message
   let msgContent = msg.content;
 
+  //Help Alternatives
+  if (msgContent == botPrefix || (msgContent == '<@!' + client.user.id + '>')) {
+    msgContent = `${botPrefix}help`;
+  }
+
   //Check for valid command
   if(msgContent != null &&
-     msgContent.startsWith(botPrefix)){
-      let command = checkCommand(msgContent.substring(botPrefix.length));
-      if (command.ValidCommand){
-        runCommand(command,msg,settings);
-      }else{
-        msg.reply('Sorry, invalid command.');
-      }
+      msgContent.startsWith(botPrefix)){
+        //Generates the command object with args
+        let command = checkCommand(msgContent.substring(botPrefix.length));
+
+        command.ValidCommand ? runCommand(command,msg,settings) : msg.reply('Sorry, invalid command.');
   }
 });
 

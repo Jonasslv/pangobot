@@ -7,9 +7,11 @@ const cooldownSet = new Set();
 function checkCommand(str){
     hasCommand = false;
     let reportedCommand = '';
+    let args = '';
     //For every command in commandList
     commandList.every(function(element, index) {
         hasCommand = (element == str.substring(0,element.length));
+        args = str.substring(element.length);
         if (hasCommand) {
             reportedCommand = element;
             return false;
@@ -17,9 +19,13 @@ function checkCommand(str){
         else return true
     })
 
-    return {ValidCommand:hasCommand,ReportedCommand:reportedCommand};
+    //Return if the command is valid, the command and their args
+    return {ValidCommand:hasCommand,
+            ReportedCommand:reportedCommand,
+            Args:args};
 }
 
+//Cooldown function, stores in memory the cooldown timer, takes settings.json timeout
 function checkCooldown(msg, command, cooldownMessage) {
     if (cooldownSet.has(msg.guild.id + command)) {
         msg.channel.send('This command is in cooldown, wait a little.').then(message =>
@@ -42,6 +48,10 @@ function makeEmbed(embedObject){
       .setColor(embedObject.Color)
       // Set the main content of the embed
       .setDescription(embedObject.Description);
+    //Lookup for fields
+    if (embedObject.Fields != undefined){
+        embed.SetFields(embedObject.Fields);
+    }
     return embed;
 }
 
