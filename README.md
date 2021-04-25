@@ -1,5 +1,9 @@
 # PangoBot Version 0.1 (in development).
 
+![Licence](https://img.shields.io/github/license/Jonasslv/pangobot)
+![Commited](https://img.shields.io/github/last-commit/Jonasslv/pangobot/main)
+
+
 Open Source discord bot for showing useful information in general about Pangolin Exchange.
 
 Shows PNG price in the bot personal status.
@@ -17,7 +21,7 @@ Using p! prefix for commands.
 Server Commands:
 - Help    (p!help)
   - Command List  (p!help cmd)
-  - What's PNG    (p!help png)
+  - What's Pangolin (p!help pangolin)
   - Links    (p!help links) (Link to pangolin exchange, analytics, forum and official discord invite). Useful for using the bot in other discord servers.
 
 - APY (Input Pool). Shows the current APY of PNG Staking Pool and how much each token of the pool costs.
@@ -38,3 +42,4 @@ Server Commands:
 - Command to input a wallet address to show info about all PGL pools of this wallet.
 - Command to show PNG/PGL top wallet addresses.
 - Current Governance proposals and % Votes (There's a way to query this?).
+- Random pangolin GIFs?
