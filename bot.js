@@ -1,7 +1,7 @@
 const { Client } = require('discord.js');
 const { readFileSync } = require('fs');
 const { checkCommand } = require('./src/utils.js');
-const { runCommand } = require('./src/commands.js');
+const { runCommand,runWelcome } = require('./src/commands.js');
 
 //Create instance of bot.
 const client = new Client();
@@ -18,6 +18,9 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+client.on('guildMemberAdd',member => {
+  runWelcome(settings,member);
+});
 
 //On message
 client.on('message', msg => {

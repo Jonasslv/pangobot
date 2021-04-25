@@ -27,14 +27,14 @@ function checkCommand(str){
 
 //Cooldown function, stores in memory the cooldown timer, takes settings.json timeout
 function checkCooldown(msg, command, cooldownMessage) {
-    if (cooldownSet.has(msg.guild.id + command)) {
+    if (cooldownSet.has(msg.author.id + command)) {
         msg.channel.send('This command is in cooldown, wait a little.').then(message =>
             message.delete({timeout:cooldownMessage}));
         return false;
     } else {
-        cooldownSet.add(msg.guild.id + command);
+        cooldownSet.add(msg.author.id + command);
         setTimeout(() => {
-            cooldownSet.delete(msg.guild.id + command);
+            cooldownSet.delete(msg.author.id + command);
         }, cooldownMessage+1000);
         return true;
     }

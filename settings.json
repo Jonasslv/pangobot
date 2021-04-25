@@ -8,5 +8,6 @@
     "gitChannel":"829130955931385876",
     "gitAddress":"https://github.com/pangolindex/pangolin.exchange",
     "refreshTokenList":60000,
-    "cooldownMessage":4000
+    "cooldownMessage":4000,
+    "sendWelcomeDM":"True"
 }
