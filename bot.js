@@ -1,10 +1,12 @@
 const { Client } = require('discord.js');
 const { readFileSync } = require('fs');
 const { checkCommand } = require('./src/utils.js');
+const { retrieveAllTokensData } = require('./src/graph.js');
 const { runCommand,runWelcome } = require('./src/commands.js');
 
 //Create instance of bot.
 const client = new Client();
+
 
 //Sync read to wait for settings
 var settings = JSON.parse(readFileSync('./settings.json'));
@@ -14,8 +16,13 @@ const botPrefix = settings.botprefix;
 //Login with set token ID
 client.login(settings.tokenid);
 
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  //Create timer to refresh tokens data
+  retrieveAllTokensData(client);
+  setTimeout(retrieveAllTokensData, settings.refreshTokenList, client);
+  console.log('Tokens loaded!');
 });
 
 client.on('guildMemberAdd',member => {

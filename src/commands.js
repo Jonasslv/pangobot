@@ -1,12 +1,14 @@
 const { checkCooldown, makeEmbed } = require('./utils.js');
+const lodash = require('lodash');
 const { commandList } = require('./commandlist.js');
 const { CommandRunner } = require('./objects.js');
-const { MessagesStrings } = require('./messages.js')
+const { getTokenList, getAVAXValue } = require('./graph.js');
+const { getMessage } = require('./resources.js');
+
 
 //Color orange
 const pangoColor = 15105570;
 
-var messagesStrings = new MessagesStrings();
 
 function runCommand(command, msg, settings) {
     if (checkCooldown(msg, command.ReportedCommand, settings.cooldownMessage)) {
@@ -15,19 +17,22 @@ function runCommand(command, msg, settings) {
             case 'help':
                 commandHelp(command, msg, settings);
                 break;
+            case 'token':
+                commandTokenCheck(command, msg, settings);
+                break;
         }
     }
 }
 
 function runWelcome(settings, member) {
-    if (settings.sendWelcomeDM) {
+    if (settings.sendWelcomeDM && member.guild.id == settings.pangolinServerID) {
         member.user.createDM().then(channel => {
             let embedObject = {
-                Title: 'Welcome to Pangolin DEX Official Discord!',
+                Title: 'Welcome to Pangolin DEX Community Discord!',
                 Color: pangoColor,
                 Description: 'Before posting please read the #faq and #resources!\n' +
-                    'If you need any additional information use `p!help` here in DM or in #bot-spam!\n\n'+
-                    messagesStrings.getMessage('links')
+                    'If you need any additional information use `p!help` here in DM or in #bot-spam!\n\n' +
+                    getMessage('links')
             };
             channel.send(makeEmbed(embedObject));
 
@@ -35,7 +40,47 @@ function runWelcome(settings, member) {
     }
 }
 
+//Function for replying user with token value
 function commandTokenCheck(command, msg, settings) {
+    runTokenCheck = new CommandRunner(msg);
+    if (command.Args.trim().length > 0) {
+        let list = getTokenList();
+
+        //Correct Wrapped Names
+        if (command.Args.trim() == "AVAX") {
+            command.Args = "WAVAX"
+        }
+        if (command.Args.trim() == "BTC") {
+            command.Args = "WBTC"
+        }
+
+        //filter list
+        let filteredResult = lodash.filter(list, { "symbol": command.Args.trim() })
+        let orderedResult =  lodash.orderBy(filteredResult,["totalLiquidity", "tradeVolume"], ['desc', 'desc']);
+        
+        if (orderedResult.length > 0) {
+
+            let tokenPrice = (getAVAXValue() * orderedResult[0].derivedETH).toFixed(2);
+            let tradeVolume = (orderedResult[0].tradeVolume * tokenPrice).toFixed(2);
+            let totalLiquidity = (orderedResult[0].totalLiquidity * tokenPrice).toFixed(2);
+            let embedObject = {
+                Title: orderedResult[0].name,
+                Color: pangoColor,
+                URL:`https://cchain.explorer.avax.network/address/${orderedResult[0].id}`,
+                Description: `**Symbol:** ${orderedResult[0].symbol}\n` +
+                    `**Price:** $${tokenPrice}\n` +
+                    `**Total Volume:** $${tradeVolume}\n` +
+                    `**Total Liquidity:** $${totalLiquidity}\n\n`,
+                Footer: "Values updated every minute"
+            };
+            runTokenCheck.embed = embedObject;
+            runTokenCheck.sendMessage();
+
+        } else {
+            msg.reply("Sorry token not found!");
+        }
+
+    }
 
 
 }
@@ -47,7 +92,7 @@ function commandHelp(command, msg, settings) {
         //Feed the command embed
         runHelp.embed = {
             Title: 'Pangolin Bot',
-            Description: messagesStrings.getMessage('help'),
+            Description: getMessage('help'),
             Color: pangoColor
         }
         //send message
@@ -80,7 +125,7 @@ function commandHelp(command, msg, settings) {
                 //Feed the command embed
                 runHelp.embed = {
                     Title: 'Pangolin - Useful Links',
-                    Description: messagesStrings.getMessage('links'),
+                    Description: getMessage('links'),
                     Color: pangoColor
                 }
                 //send message
@@ -90,13 +135,13 @@ function commandHelp(command, msg, settings) {
                 //Feed the command embed
                 runHelp.embed = {
                     Title: 'What\'s Pangolin?',
-                    Description: messagesStrings.getMessage('pangolin'),
+                    Description: getMessage('pangolin'),
                     Color: pangoColor
                 }
                 //send message
                 runHelp.sendMessage();
                 break;
-            default:messagesStrings
+            default: messagesStrings
                 msg.reply('Sorry, Invalid Command.');
         }
     }

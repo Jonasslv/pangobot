@@ -4,10 +4,8 @@
     "turnOnTwitterIFTTT":"True",
     "twitterChannel":"829130975438569472",
     "twitterAddress":"https://twitter.com/pangolindex",
-    "turnOnGitIFTTT":"True",
-    "gitChannel":"829130955931385876",
-    "gitAddress":"https://github.com/pangolindex/pangolin.exchange",
     "refreshTokenList":60000,
     "cooldownMessage":4000,
-    "sendWelcomeDM":"True"
+    "sendWelcomeDM":"True",
+    "pangolinServerID":"707004932821352488"
 }

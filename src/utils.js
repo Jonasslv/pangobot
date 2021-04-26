@@ -46,12 +46,24 @@ function makeEmbed(embedObject){
       .setTitle(embedObject.Title)
       // Set the color of the embed
       .setColor(embedObject.Color)
+      // Put timestamp in the footer
+      .setTimestamp()
       // Set the main content of the embed
       .setDescription(embedObject.Description);
     //Lookup for fields
     if (embedObject.Fields != undefined){
-        embed.SetFields(embedObject.Fields);
+        embed.addFields(embedObject.Fields);
+    };
+    if(embedObject.Thumbnail != undefined){
+        embed.setThumbnail(embedObject.Thumbnail);
+    };
+    if(embedObject.Footer != undefined){
+        embed.setFooter(embedObject.Footer);
     }
+    if(embedObject.URL != undefined){
+        embed.setURL(embedObject.URL);
+    }
+    
     return embed;
 }
 

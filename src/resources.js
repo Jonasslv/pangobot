@@ -34,22 +34,18 @@ pangolin = '**Pangolin** is a decentralized exchange (**DEX**) which runs on **A
 'community-driven development, and a fair and open token distribution.';
 
 
+function getMessage(messageName){
+    switch(messageName){    
+        case 'help': return help;
+        case 'links': return links;
+        case 'pangolin': return pangolin;
+    }
 
+}
 
 
 module.exports = {
-    MessagesStrings: class {
-        constructor() {
-            this.getMessage = function(messageName){
-                switch(messageName){    
-                    case 'help': return help;
-                    case 'links': return links;
-                    case 'pangolin': return pangolin;
-                }
-    
-            }
-        }
-    }
+    getMessage:getMessage
 }
 
 

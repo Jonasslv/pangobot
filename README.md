@@ -13,7 +13,7 @@ Using p! prefix for commands.
 
 # Automatic Functions (Turnable on/off)
 - Send welcome DM message when a member enter the server with useful information. (Links and Rules)
-- Reflect Twitter/Github activity in sets chat room.
+- Reflect Twitter activity in sets chat room. (Github scrapped since you can easily do a webhook)
 
 
 # Command List:
