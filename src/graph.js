@@ -1,16 +1,13 @@
 const axios = require('axios');
 const lodash = require('lodash');
-
-const pangolinGraphAddress = "https://graph-node.avax.network/subgraphs/name/dasconnor/pangolindex";
-const USDTAVAXPairContract = "0x9ee0a4e21bd333a6bb2ab298194320b8daa26516";
-const imageLists = "";
+const { Constants } = require('./resources.js');
 
 var tokenlist;
 var AVAXValue;
 
 async function genericQuery(queryObject) {
     let query = await axios({
-        url: 'https://graph-node.avax.network/subgraphs/name/dasconnor/pangolindex',
+        url: Constants.pangolinGraphAddress,
         method: 'post',
         data: {
             query: queryObject
@@ -28,7 +25,7 @@ async function genericQuery(queryObject) {
 async function retrieveAVAXPrice(){
     let result = await genericQuery(
         `query {
-            pair(id: \"${USDTAVAXPairContract}\") {
+            pair(id: \"${Constants.USDTAVAXPairContract}\") {
                 token1Price
             }
         }`
@@ -41,12 +38,12 @@ async function retrieveAVAXPrice(){
 
 }
 
-//TO-DO this query for now has 1000 tokens limit, in the future it will need to be
-//upgraded.
+//TO-DO this query for now has 1000 tokens limit, although it's prioritizing most traded tokens
+//in the future it will need to be upgraded.
 async function retrieveAllTokensData(client) {
     let result = await genericQuery(
         `query {
-            tokens(first: 1000) {
+            tokens(first: 1000, orderBy:  tradeVolumeUSD orderDirection:desc) {
                 id
                 name
                 symbol

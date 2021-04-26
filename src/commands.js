@@ -3,11 +3,7 @@ const lodash = require('lodash');
 const { commandList } = require('./commandlist.js');
 const { CommandRunner } = require('./objects.js');
 const { getTokenList, getAVAXValue } = require('./graph.js');
-const { getMessage } = require('./resources.js');
-
-
-//Color orange
-const pangoColor = 15105570;
+const { getMessage, Constants } = require('./resources.js');
 
 
 function runCommand(command, msg, settings) {
@@ -29,7 +25,7 @@ function runWelcome(settings, member) {
         member.user.createDM().then(channel => {
             let embedObject = {
                 Title: 'Welcome to Pangolin DEX Community Discord!',
-                Color: pangoColor,
+                Color: Constants.pangoColor,
                 Description: 'Before posting please read the #faq and #resources!\n' +
                     'If you need any additional information use `p!help` here in DM or in #bot-spam!\n\n' +
                     getMessage('links')
@@ -56,19 +52,20 @@ function commandTokenCheck(command, msg, settings) {
 
         //filter list
         let filteredResult = lodash.filter(list, { "symbol": command.Args.trim() })
-        let orderedResult =  lodash.orderBy(filteredResult,["totalLiquidity", "tradeVolume"], ['desc', 'desc']);
-        
+        let orderedResult = lodash.orderBy(filteredResult, ["totalLiquidity", "tradeVolume"], ['desc', 'desc']);
+
         if (orderedResult.length > 0) {
 
-            let tokenPrice = (getAVAXValue() * orderedResult[0].derivedETH).toFixed(2);
+            let tokenPrice = (getAVAXValue() * orderedResult[0].derivedETH);
             let tradeVolume = (orderedResult[0].tradeVolume * tokenPrice).toFixed(2);
             let totalLiquidity = (orderedResult[0].totalLiquidity * tokenPrice).toFixed(2);
             let embedObject = {
                 Title: orderedResult[0].name,
-                Color: pangoColor,
-                URL:`https://cchain.explorer.avax.network/address/${orderedResult[0].id}`,
+                Color: Constants.pangoColor,
+                URL: `${Constants.explorerAdress}address/${orderedResult[0].id}`,
                 Description: `**Symbol:** ${orderedResult[0].symbol}\n` +
-                    `**Price:** $${tokenPrice}\n` +
+                    `**Price:** $${tokenPrice > 0.01 ? tokenPrice.toFixed(2) :
+                        tokenPrice > 0.000001 ? tokenPrice.toFixed(6) : tokenPrice.toFixed(18)}\n` +
                     `**Total Volume:** $${tradeVolume}\n` +
                     `**Total Liquidity:** $${totalLiquidity}\n\n`,
                 Footer: "Values updated every minute"
@@ -93,7 +90,7 @@ function commandHelp(command, msg, settings) {
         runHelp.embed = {
             Title: 'Pangolin Bot',
             Description: getMessage('help'),
-            Color: pangoColor
+            Color: Constants.pangoColor
         }
         //send message
         runHelp.sendMessage();
@@ -115,7 +112,7 @@ function commandHelp(command, msg, settings) {
                     Title: 'Pangolin - Commands',
                     Description: '**Command List:**\n' +
                         strList,
-                    Color: pangoColor
+                    Color: Constants.pangoColor
                 }
                 //send message
                 runHelp.sendMessage();
@@ -126,7 +123,7 @@ function commandHelp(command, msg, settings) {
                 runHelp.embed = {
                     Title: 'Pangolin - Useful Links',
                     Description: getMessage('links'),
-                    Color: pangoColor
+                    Color: Constants.pangoColor
                 }
                 //send message
                 runHelp.sendMessage();
@@ -136,7 +133,7 @@ function commandHelp(command, msg, settings) {
                 runHelp.embed = {
                     Title: 'What\'s Pangolin?',
                     Description: getMessage('pangolin'),
-                    Color: pangoColor
+                    Color: Constants.pangoColor
                 }
                 //send message
                 runHelp.sendMessage();
