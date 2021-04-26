@@ -20,8 +20,7 @@ client.login(settings.tokenid);
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   //Create timer to refresh tokens data
-  retrieveAllTokensData(client);
-  setTimeout(retrieveAllTokensData, settings.refreshTokenList, client);
+  retrieveAllTokensData({client:client,settings:settings});
   console.log('Tokens loaded!');
 });
 

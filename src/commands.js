@@ -37,6 +37,7 @@ function runWelcome(settings, member) {
 }
 
 //Function for replying user with token value
+//TO-DO Price change last 24h, Volume 24h
 function commandTokenCheck(command, msg, settings) {
     runTokenCheck = new CommandRunner(msg);
     if (command.Args.trim().length > 0) {
