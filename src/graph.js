@@ -23,7 +23,7 @@ async function genericQuery(queryObject) {
 
 //Get AVAX Price from the USDT Pair
 async function retrieveAVAXPrice(){
-    let result = await genericQuery(
+    let USDTPrice = await genericQuery(
         `query {
             pair(id: \"${Constants.USDTAVAXPairContract}\") {
                 token1Price
@@ -31,9 +31,18 @@ async function retrieveAVAXPrice(){
         }`
     );
 
-    if (result.data != undefined) {
-        //save JSON List
-        AVAXValue = result.data.data.pair.token1Price;
+    let DAIPrice = await genericQuery(
+        `query {
+            pair(id: \"${Constants.DAIAVAXPairContract}\") {
+                token1Price
+            }
+        }`
+    );
+
+    if (USDTPrice.data != undefined && DAIPrice.data != undefined) {
+        AVAXValue = undefined;
+        //Mid-term between DAI and USDT price (add TUSD and USDC after??)
+        AVAXValue = (USDTPrice.data.data.pair.token1Price/2.0)+(DAIPrice.data.data.pair.token1Price/2.0);
     }
 
 }
@@ -59,6 +68,7 @@ async function retrieveAllTokensData(args) {
         await retrieveAVAXPrice();
 
         //save JSON List
+        tokenlist = undefined;
         tokenlist = result.data.data.tokens;
 
         //update bot presence

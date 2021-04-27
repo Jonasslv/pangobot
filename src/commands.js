@@ -1,9 +1,8 @@
 const { checkCooldown, makeEmbed } = require('./utils.js');
 const lodash = require('lodash');
-const { commandList } = require('./commandlist.js');
 const { CommandRunner } = require('./objects.js');
 const { getTokenList, getAVAXValue } = require('./graph.js');
-const { getMessage, Constants } = require('./resources.js');
+const { getMessage, Constants,commandList } = require('./resources.js');
 
 
 function runCommand(command, msg, settings) {
@@ -53,18 +52,17 @@ function commandTokenCheck(command, msg, settings) {
 
         //filter list
         let filteredResult = lodash.filter(list, { "symbol": command.Args.trim() })
-        let orderedResult = lodash.orderBy(filteredResult, ["totalLiquidity", "tradeVolume"], ['desc', 'desc']);
 
-        if (orderedResult.length > 0) {
+        if (filteredResult.length > 0) {
 
-            let tokenPrice = (getAVAXValue() * orderedResult[0].derivedETH);
-            let tradeVolume = (orderedResult[0].tradeVolume * tokenPrice).toFixed(2);
-            let totalLiquidity = (orderedResult[0].totalLiquidity * tokenPrice).toFixed(2);
+            let tokenPrice = (getAVAXValue() * filteredResult[0].derivedETH);
+            let tradeVolume = (filteredResult[0].tradeVolume * tokenPrice).toFixed(2);
+            let totalLiquidity = (filteredResult[0].totalLiquidity * tokenPrice).toFixed(2);
             let embedObject = {
-                Title: orderedResult[0].name,
+                Title: filteredResult[0].name,
                 Color: Constants.pangoColor,
-                URL: `${Constants.explorerAdress}address/${orderedResult[0].id}`,
-                Description: `**Symbol:** ${orderedResult[0].symbol}\n` +
+                URL: `${Constants.explorerAdress}address/${filteredResult[0].id}`,
+                Description: `**Symbol:** ${filteredResult[0].symbol}\n` +
                     `**Price:** $${tokenPrice > 0.01 ? tokenPrice.toFixed(2) :
                         tokenPrice > 0.000001 ? tokenPrice.toFixed(6) : tokenPrice.toFixed(18)}\n` +
                     `**Total Volume:** $${tradeVolume}\n` +

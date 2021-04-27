@@ -1,4 +1,4 @@
-const { commandList } = require('./commandlist.js');
+const { commandList } = require('./resources.js');
 const { MessageEmbed } = require('discord.js');
 
 const cooldownSet = new Set();

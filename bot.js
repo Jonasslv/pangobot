@@ -2,7 +2,7 @@ const { Client } = require('discord.js');
 const { readFileSync } = require('fs');
 const { checkCommand } = require('./src/utils.js');
 const { retrieveAllTokensData } = require('./src/graph.js');
-const { runCommand,runWelcome } = require('./src/commands.js');
+const { runCommand, runWelcome } = require('./src/commands.js');
 
 //Create instance of bot.
 const client = new Client();
@@ -20,12 +20,12 @@ client.login(settings.tokenid);
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   //Create timer to refresh tokens data
-  retrieveAllTokensData({client:client,settings:settings});
+  retrieveAllTokensData({ client: client, settings: settings });
   console.log('Tokens loaded!');
 });
 
-client.on('guildMemberAdd',member => {
-  runWelcome(settings,member);
+client.on('guildMemberAdd', member => {
+  runWelcome(settings, member);
 });
 
 //On message
@@ -39,12 +39,12 @@ client.on('message', msg => {
   }
 
   //Check for valid command
-  if(msgContent != null &&
-      msgContent.startsWith(botPrefix)){
-        //Generates the command object with args
-        let command = checkCommand(msgContent.substring(botPrefix.length));
+  if (msgContent != null &&
+    msgContent.startsWith(botPrefix)) {
+    //Generates the command object with args
+    let command = checkCommand(msgContent.substring(botPrefix.length));
 
-        command.ValidCommand ? runCommand(command,msg,settings) : msg.reply('Sorry, invalid command.');
+    command.ValidCommand ? runCommand(command, msg, settings) : msg.reply('Sorry, invalid command.');
   }
 });
 
