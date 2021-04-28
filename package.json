@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "discord.js": "^12.5.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "lokijs": "^1.5.12"
   }
 }

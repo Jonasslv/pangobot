@@ -1,6 +1,6 @@
 const { Client } = require('discord.js');
 const { readFileSync } = require('fs');
-const { checkCommand } = require('./src/utils.js');
+const { checkCommand,retrieveImageList } = require('./src/utils.js');
 const { retrieveAllTokensData } = require('./src/graph.js');
 const { runCommand, runWelcome } = require('./src/commands.js');
 
@@ -22,6 +22,7 @@ client.on('ready', () => {
   //Create timer to refresh tokens data
   retrieveAllTokensData({ client: client, settings: settings });
   console.log('Tokens loaded!');
+  retrieveImageList();
 });
 
 client.on('guildMemberAdd', member => {

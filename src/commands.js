@@ -2,7 +2,7 @@ const { checkCooldown, makeEmbed } = require('./utils.js');
 const lodash = require('lodash');
 const { CommandRunner } = require('./objects.js');
 const { getTokenList, getAVAXValue } = require('./graph.js');
-const { getMessage, Constants,commandList } = require('./resources.js');
+const { getMessage, Constants,commandList,TokenImageList } = require('./resources.js');
 
 
 function runCommand(command, msg, settings) {
@@ -50,10 +50,19 @@ function commandTokenCheck(command, msg, settings) {
             command.Args = "WBTC"
         }
 
-        //filter list
-        let filteredResult = lodash.filter(list, { "symbol": command.Args.trim() })
+        //filter list by symbol, then name, then id
+        let filteredResult = lodash.filter(list, { "symbol": command.Args.trim() });
+        if (filteredResult.length == 0) {
+            filteredResult = lodash.filter (list, { "name": command.Args.trim() });
+        }
+        if (filteredResult.length == 0) {
+            filteredResult = lodash.filter (list, { "id": command.Args.trim() });
+        }
+        
 
         if (filteredResult.length > 0) {
+            //get token Image
+            let imageList = lodash.filter(TokenImageList.getTokenImageList(), { "address": filteredResult[0].id.toLowerCase() });
 
             let tokenPrice = (getAVAXValue() * filteredResult[0].derivedETH);
             let tradeVolume = (filteredResult[0].tradeVolume * tokenPrice).toFixed(2);
@@ -64,11 +73,14 @@ function commandTokenCheck(command, msg, settings) {
                 URL: `${Constants.explorerAdress}address/${filteredResult[0].id}`,
                 Description: `**Symbol:** ${filteredResult[0].symbol}\n` +
                     `**Price:** $${tokenPrice > 0.01 ? tokenPrice.toFixed(2) :
-                        tokenPrice > 0.000001 ? tokenPrice.toFixed(6) : tokenPrice.toFixed(18)}\n` +
+                        tokenPrice > 0.000001 ? tokenPrice.toFixed(6) : tokenPrice.toExponential(6)}\n` +
                     `**Total Volume:** $${tradeVolume}\n` +
                     `**Total Liquidity:** $${totalLiquidity}\n\n`,
                 Footer: "Values updated every minute"
             };
+            if(imageList.length > 0)  {
+                embedObject.Thumbnail = imageList[0].logoURI; 
+            }
             runTokenCheck.embed = embedObject;
             runTokenCheck.sendMessage();
 

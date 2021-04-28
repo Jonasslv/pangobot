@@ -41,7 +41,7 @@ async function retrieveAVAXPrice(){
 
     if (USDTPrice.data != undefined && DAIPrice.data != undefined) {
         AVAXValue = undefined;
-        //Mid-term between DAI and USDT price (add TUSD and USDC after??)
+        //Mid-term between DAI and USDT price 
         AVAXValue = (USDTPrice.data.data.pair.token1Price/2.0)+(DAIPrice.data.data.pair.token1Price/2.0);
     }
 

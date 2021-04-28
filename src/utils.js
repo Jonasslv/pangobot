@@ -1,7 +1,34 @@
-const { commandList } = require('./resources.js');
+const { commandList,Constants,TokenImageList } = require('./resources.js');
 const { MessageEmbed } = require('discord.js');
+const https = require('https');
 
 const cooldownSet = new Set();
+
+async function retrieveImageList(){
+    Constants.officialTokenLists.forEach((element) => {
+        https.get(element,(res) => {
+            let body = "";
+        
+            res.on("data", (chunk) => {
+                body += chunk;
+            });
+        
+            res.on("end", () => {
+                try {
+                    (JSON.parse(body)).tokens.forEach((element2) =>{
+                        TokenImageList.appendTokenImageList({address:element2.address.toLowerCase(),logoURI:element2.logoURI});
+                    });
+                    console.log("Loaded image list.");
+                } catch (error) {
+                    console.error(error.message);
+                };
+            });
+        }).on("error", (error) => {
+            console.error(error.message);
+        });
+
+    });
+}
 
 //Function for checking if the command is valid
 function checkCommand(str){
@@ -71,5 +98,6 @@ function makeEmbed(embedObject){
 module.exports = {
     checkCommand:checkCommand,
     checkCooldown:checkCooldown,
-    makeEmbed:makeEmbed
+    makeEmbed:makeEmbed,
+    retrieveImageList:retrieveImageList
 }
