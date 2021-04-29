@@ -62,7 +62,7 @@ function commandAlertCreate(command, msg) {
             let listSerialized = ``;
             listUser.forEach( (element) =>{
                 let filteredResult = filterToken(element.tokenId);
-                listSerialized+= `**Token**: ${filteredResult[0].symbol} - **Price**: ${element.price}\n`
+                listSerialized+= `**Token**: ${filteredResult[0].symbol} - **Price**: $${element.price}\n`
             });
 
             let embedObject = {
@@ -105,7 +105,7 @@ function commandAlertCreate(command, msg) {
                 case 'set':
                     //Query user to see if he is abusing of the alerts
                     listUser = DatabaseHandler.searchDatabaseCollection('alerts', { user: msg.author.id });
-                    if (listUser.length > 10) {
+                    if (listUser.length >= 10) {
                         msg.reply("Sorry the alerts are limited by 10 for each user.");
                     } else {
                         //Query if it`s a duplicated alert
@@ -113,13 +113,15 @@ function commandAlertCreate(command, msg) {
                         if (listUser.length > 0) {
                             msg.reply("This alert seems duplicated, try again.");
                         } else {
-                            if (DatabaseHandler.saveObjDatabase('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId })) {
+                            let oldPrice = (getAVAXValue() * filteredResult[0].derivedETH);
+                            oldPrice = oldPrice > 0.01 ? oldPrice.toFixed(2) : oldPrice > 0.000001 ? oldPrice.toFixed(6) : oldPrice.toExponential(6);
+                            if (DatabaseHandler.saveObjDatabase('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId, oldPrice:oldPrice })) {
                                 let embedObject = {
                                     Title: 'Token Alert Create',
                                     Color: Constants.pangoColor,
                                     Description: `Alert created successfully for user **${msg.author.username}**.\n\n` +
                                         `**Token**: ${token}\n` +
-                                        `**Price**: ${tokenValue}`
+                                        `**Price**: $${tokenValue}`
                                 };
                                 if (imageList.length > 0) {
                                     embedObject.Thumbnail = imageList[0].logoURI;
@@ -140,7 +142,7 @@ function commandAlertCreate(command, msg) {
                                 Color: Constants.pangoColor,
                                 Description: `Alert removed successfully for user **${msg.author.username}**.\n\n` +
                                     `**Token**: ${token}\n` +
-                                    `**Price**: ${tokenValue}`
+                                    `**Price**: $${tokenValue}`
                             };
                             if (imageList.length > 0) {
                                 embedObject.Thumbnail = imageList[0].logoURI;

@@ -1,14 +1,14 @@
-const { commandList,Constants,TokenImageList } = require('./resources.js');
+const { commandList, Constants, TokenImageList } = require('./resources.js');
 const { MessageEmbed } = require('discord.js');
-const { getTokenList } = require('./graph.js');
+const { getTokenList, getAVAXValue } = require('./graph.js');
 const https = require('https');
 const loki = require("lokijs");
 const lodash = require('lodash');
 
 var database = new loki('database.db', {
     autoload: true,
-    autoloadCallback : databaseInitialize,
-    autosave: true, 
+    autoloadCallback: databaseInitialize,
+    autosave: true,
     autosaveInterval: 4000
 });
 
@@ -24,19 +24,19 @@ function databaseInitialize() {
 
 const cooldownSet = new Set();
 
-async function retrieveImageList(){
+async function retrieveImageList() {
     Constants.officialTokenLists.forEach((element) => {
-        https.get(element,(res) => {
+        https.get(element, (res) => {
             let body = "";
-        
+
             res.on("data", (chunk) => {
                 body += chunk;
             });
-        
+
             res.on("end", () => {
                 try {
-                    (JSON.parse(body)).tokens.forEach((element2) =>{
-                        TokenImageList.appendTokenImageList({address:element2.address.toLowerCase(),logoURI:element2.logoURI});
+                    (JSON.parse(body)).tokens.forEach((element2) => {
+                        TokenImageList.appendTokenImageList({ address: element2.address.toLowerCase(), logoURI: element2.logoURI });
                     });
                     console.log("Loaded image list.");
                 } catch (error) {
@@ -45,19 +45,73 @@ async function retrieveImageList(){
             });
         }).on("error", (error) => {
             console.error(error.message);
-        });  
+        });
 
     });
 }
 
+function sendDMAlert(user, token, element, tokenPrice) {
+    function sendDMChannel(channel){
+        let imageList = lodash.filter(TokenImageList.getTokenImageList(), { "address": token[0].id.toLowerCase() });
+        let embedObject = {
+            Title: token[0].name,
+            Color: Constants.pangoColor,
+            URL: `${Constants.explorerAdress}address/${token[0].id}`,
+            Description: `Token Alert requested by user for price $${element.price}\n` +
+                `ATTENTION: Token: **${token[0].name}** achieved $**${tokenPrice}**, the alert will now be dismissed.`
+        };
+        if (imageList.length > 0) {
+            embedObject.Thumbnail = imageList[0].logoURI;
+        }
+        channel.send(makeEmbed(embedObject));
+    }
+
+    if(user.DMChannel != undefined){
+        sendDMChannel(user.DMChannel);
+    }else{
+        user.createDM().then(channel => {
+            sendDMChannel(channel);
+        });
+    }
+}
+
+async function checkAlerts(client) {
+    let data = DatabaseHandler.listDatabaseCollection('alerts');
+    data.forEach((element) => {
+        let token = filterToken(element.tokenId);
+        if (token.length > 0) {
+            let tokenPrice = (getAVAXValue() * token[0].derivedETH);
+            if (element.price > element.oldPrice) {
+                if (tokenPrice >= element.price) {
+                    client.users.fetch(element.user).then((user) => {
+                        if(user != undefined){
+                            sendDMAlert(user, token, element, tokenPrice);
+                            DatabaseHandler.removeObjDatabase('alerts', element);
+                        }
+                    });
+                }
+            } else {
+                if (tokenPrice <= element.price) {
+                    client.users.fetch(element.user).then((user) => {
+                        if(user != undefined){
+                            sendDMAlert(user, token, element, tokenPrice);
+                            DatabaseHandler.removeObjDatabase('alerts', element);
+                        }
+                    });
+                }
+            }
+        }
+    });
+}
+
 //Function for checking if the command is valid
-function checkCommand(str){
+function checkCommand(str) {
     hasCommand = false;
     let reportedCommand = '';
     let args = '';
     //For every command in commandList
-    commandList.every(function(element, index) {
-        hasCommand = (element == str.substring(0,element.length));
+    commandList.every(function (element, index) {
+        hasCommand = (element == str.substring(0, element.length));
         args = str.substring(element.length);
         if (hasCommand) {
             reportedCommand = element;
@@ -67,13 +121,15 @@ function checkCommand(str){
     })
 
     //Return if the command is valid, the command and their args
-    return {ValidCommand:hasCommand,
-            ReportedCommand:reportedCommand,
-            Args:args};
+    return {
+        ValidCommand: hasCommand,
+        ReportedCommand: reportedCommand,
+        Args: args
+    };
 }
 
 //Filter existing tokens
-function filterToken(args){
+function filterToken(args) {
     let list = getTokenList();
 
     //Correct Wrapped Names
@@ -87,12 +143,12 @@ function filterToken(args){
     //filter list by symbol, then name, then id
     let filteredResult = lodash.filter(list, { "symbol": args });
     if (filteredResult.length == 0) {
-        filteredResult = lodash.filter (list, { "name": args });
+        filteredResult = lodash.filter(list, { "name": args });
     }
     if (filteredResult.length == 0) {
-        filteredResult = lodash.filter (list, { "id": args });
+        filteredResult = lodash.filter(list, { "id": args });
     }
-    
+
     return filteredResult;
 }
 
@@ -100,74 +156,76 @@ function filterToken(args){
 function checkCooldown(msg, command, cooldownMessage) {
     if (cooldownSet.has(msg.author.id + command)) {
         msg.channel.send('This command is in cooldown, wait a little.').then(message =>
-            message.delete({timeout:cooldownMessage}));
+            message.delete({ timeout: cooldownMessage }));
         return false;
     } else {
         cooldownSet.add(msg.author.id + command);
         setTimeout(() => {
             cooldownSet.delete(msg.author.id + command);
-        }, cooldownMessage+1000);
+        }, cooldownMessage + 1000);
         return true;
     }
 }
 
-function makeEmbed(embedObject){
+function makeEmbed(embedObject) {
     let embed = new MessageEmbed()
-      // Set the title of the field
-      .setTitle(embedObject.Title)
-      // Set the color of the embed
-      .setColor(embedObject.Color)
-      // Put timestamp in the footer
-      .setTimestamp()
-      // Set the main content of the embed
-      .setDescription(embedObject.Description);
+        // Set the title of the field
+        .setTitle(embedObject.Title)
+        // Set the color of the embed
+        .setColor(embedObject.Color)
+        // Put timestamp in the footer
+        .setTimestamp()
+        // Set the main content of the embed
+        .setDescription(embedObject.Description);
     //Lookup for fields
-    if (embedObject.Fields != undefined){
+    if (embedObject.Fields != undefined) {
         embed.addFields(embedObject.Fields);
     };
-    if(embedObject.Thumbnail != undefined){
+    if (embedObject.Thumbnail != undefined) {
         embed.setThumbnail(embedObject.Thumbnail);
     };
-    if(embedObject.Footer != undefined){
+    if (embedObject.Footer != undefined) {
         embed.setFooter(embedObject.Footer);
     }
-    if(embedObject.URL != undefined){
+    if (embedObject.URL != undefined) {
         embed.setURL(embedObject.URL);
     }
-    
+
     return embed;
 }
 
+class DatabaseHandler {
+    static listDatabaseCollection(collection) {
+        let data = database.getCollection(collection);
+        return data.data;
+    }
+
+    static searchDatabaseCollection(collection, findTerm) {
+        let data = database.getCollection(collection);
+        return data.find(findTerm);
+    }
+
+    static saveObjDatabase(collection, object) {
+        let data = database.getCollection(collection);
+        data.insert(object);
+        database.saveDatabase();
+        return true;
+    }
+
+    static removeObjDatabase(collection, object) {
+        let data = database.getCollection(collection);
+        data.findAndRemove(object);
+        database.saveDatabase();
+        return true;
+    }
+}
 
 module.exports = {
-    checkCommand:checkCommand,
-    checkCooldown:checkCooldown,
-    makeEmbed:makeEmbed,
-    filterToken:filterToken,
-    retrieveImageList:retrieveImageList,
-    DatabaseHandler:class{
-        static listDatabaseCollection(collection){
-            let data = database.getCollection(collection);
-            return data.data;
-        }
-
-        static searchDatabaseCollection(collection,findTerm){
-            let data = database.getCollection(collection);
-            return data.find(findTerm);
-        }
-
-        static saveObjDatabase(collection,object){
-            let data = database.getCollection(collection);
-            data.insert(object);
-            database.saveDatabase();
-            return true;
-        }
-
-        static removeObjDatabase(collection,object){
-            let data = database.getCollection(collection);
-            data.findAndRemove(object);
-            database.saveDatabase();
-            return true;
-        }
-    }
+    checkCommand: checkCommand,
+    checkCooldown: checkCooldown,
+    makeEmbed: makeEmbed,
+    filterToken: filterToken,
+    retrieveImageList: retrieveImageList,
+    DatabaseHandler: DatabaseHandler,
+    checkAlerts: checkAlerts
 }
