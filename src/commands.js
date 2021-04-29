@@ -1,8 +1,8 @@
-const { checkCooldown, makeEmbed } = require('./utils.js');
-const lodash = require('lodash');
+const { checkCooldown, makeEmbed, filterToken, DatabaseHandler } = require('./utils.js');
 const { CommandRunner } = require('./objects.js');
-const { getTokenList, getAVAXValue } = require('./graph.js');
-const { getMessage, Constants,commandList,TokenImageList } = require('./resources.js');
+const { getAVAXValue } = require('./graph.js');
+const { getMessage, Constants, commandList, TokenImageList } = require('./resources.js');
+const lodash = require('lodash');
 
 
 function runCommand(command, msg, settings) {
@@ -13,7 +13,10 @@ function runCommand(command, msg, settings) {
                 commandHelp(command, msg, settings);
                 break;
             case 'token':
-                commandTokenCheck(command, msg, settings);
+                commandTokenCheck(command, msg);
+                break;
+            case 'alert':
+                commandAlertCreate(command, msg);
                 break;
         }
     }
@@ -35,30 +38,149 @@ function runWelcome(settings, member) {
     }
 }
 
+function commandAlertCreate(command, msg) {
+    //I accept suggestions to fix this spaghetti (it works tho)
+    runAlertCreate = new CommandRunner(msg);
+    if (command.Args.trim().length == 0) {
+        InvalidCommand();
+        return;
+    }
+    let strCommand = command.Args.trim();
+
+    let firstSeparatorPosition = strCommand.indexOf(' ');
+    let operation = firstSeparatorPosition == -1 ? strCommand.substr(0) : strCommand.substr(0,firstSeparatorPosition);
+    if (['set', 'remove', 'list'].indexOf(operation) == -1) {
+        InvalidCommand();
+        return;
+    }
+
+    if (operation == 'list') {
+        let listUser = DatabaseHandler.searchDatabaseCollection('alerts', { user: msg.author.id });
+        if (listUser.length == 0) {
+            msg.reply("Sorry no alert was found for your user ID.");
+        }else{
+            let listSerialized = ``;
+            listUser.forEach( (element) =>{
+                let filteredResult = filterToken(element.tokenId);
+                listSerialized+= `**Token**: ${filteredResult[0].symbol} - **Price**: ${element.price}\n`
+            });
+
+            let embedObject = {
+                Title: 'Token Alert List',
+                Color: Constants.pangoColor,
+                Description: `List of set Alerts for user: **${msg.author.username}**\n\n` +
+                    listSerialized
+            };
+            runAlertCreate.embed = embedObject;
+            runAlertCreate.sendMessage();
+        }
+    } else {
+        if (firstSeparatorPosition == -1) {
+            InvalidCommand();
+            return;
+        }
+        let secondSeparatorPosition = (strCommand.substr(firstSeparatorPosition + 1)).indexOf(' ') + 1;
+        if (secondSeparatorPosition == -1) {
+            InvalidCommand();
+            return;
+        } else {
+            secondSeparatorPosition += firstSeparatorPosition;
+        }
+
+        let tokenValue = strCommand.substr(secondSeparatorPosition + 1);
+        if (isNaN(tokenValue)) {
+            InvalidCommand();
+            return;
+        }
+
+        let lengthToken = secondSeparatorPosition - firstSeparatorPosition - 1;
+        let token = strCommand.substr(firstSeparatorPosition + 1, lengthToken);
+        let filteredResult = filterToken(token);
+        if (filteredResult.length > 0) {
+            let tokenId = filteredResult[0].id;
+            let imageList = lodash.filter(TokenImageList.getTokenImageList(), { "address": filteredResult[0].id.toLowerCase() });
+
+            let listUser;
+            switch (operation) {
+                case 'set':
+                    //Query user to see if he is abusing of the alerts
+                    listUser = DatabaseHandler.searchDatabaseCollection('alerts', { user: msg.author.id });
+                    if (listUser.length > 10) {
+                        msg.reply("Sorry the alerts are limited by 10 for each user.");
+                    } else {
+                        //Query if it`s a duplicated alert
+                        listUser = DatabaseHandler.searchDatabaseCollection('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId });
+                        if (listUser.length > 0) {
+                            msg.reply("This alert seems duplicated, try again.");
+                        } else {
+                            if (DatabaseHandler.saveObjDatabase('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId })) {
+                                let embedObject = {
+                                    Title: 'Token Alert Create',
+                                    Color: Constants.pangoColor,
+                                    Description: `Alert created successfully for user **${msg.author.username}**.\n\n` +
+                                        `**Token**: ${token}\n` +
+                                        `**Price**: ${tokenValue}`
+                                };
+                                if (imageList.length > 0) {
+                                    embedObject.Thumbnail = imageList[0].logoURI;
+                                }
+                                runAlertCreate.embed = embedObject;
+                                runAlertCreate.sendMessage();
+                            }
+                        }
+                    }
+                    break;
+                case 'remove':
+                    //Query if the alert exists
+                    listUser = DatabaseHandler.searchDatabaseCollection('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId });
+                    if (listUser.length > 0) {
+                        if (DatabaseHandler.removeObjDatabase('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId })) {
+                            let embedObject = {
+                                Title: 'Token Alert Remove',
+                                Color: Constants.pangoColor,
+                                Description: `Alert removed successfully for user **${msg.author.username}**.\n\n` +
+                                    `**Token**: ${token}\n` +
+                                    `**Price**: ${tokenValue}`
+                            };
+                            if (imageList.length > 0) {
+                                embedObject.Thumbnail = imageList[0].logoURI;
+                            }
+                            runAlertCreate.embed = embedObject;
+                            runAlertCreate.sendMessage();
+                        }
+                    } else {
+                        msg.reply("This alert don't seems to exist, try again.");
+                    }
+                    break;
+            }
+
+        } else {
+            msg.reply("Sorry token not found for trade in Pangolin DEX!");
+        }
+    }
+
+    //If the command is wrongly formmated
+    function InvalidCommand() {
+        let embedObject = {
+            Title: 'Token Alert Command',
+            Color: Constants.pangoColor,
+            Description: 'Please input the operation, a Ticker or contract address and the value you want to be alerted.\n' +
+                'Then you will receive a DM alert if the price get in this value.\n' +
+                'Example: `p!alert set/remove PNG 2.40`\n\n'+
+                'Alternatively you can list all your alerts too.\n' +
+                'Example: `p!alert list`'
+        };
+        runAlertCreate.embed = embedObject;
+        runAlertCreate.sendMessage();
+    }
+}
+
 //Function for replying user with token value
 //TO-DO Price change last 24h, Volume 24h
-function commandTokenCheck(command, msg, settings) {
+function commandTokenCheck(command, msg) {
     runTokenCheck = new CommandRunner(msg);
     if (command.Args.trim().length > 0) {
-        let list = getTokenList();
-
-        //Correct Wrapped Names
-        if (command.Args.trim() == "AVAX") {
-            command.Args = "WAVAX"
-        }
-        if (command.Args.trim() == "BTC") {
-            command.Args = "WBTC"
-        }
-
-        //filter list by symbol, then name, then id
-        let filteredResult = lodash.filter(list, { "symbol": command.Args.trim() });
-        if (filteredResult.length == 0) {
-            filteredResult = lodash.filter (list, { "name": command.Args.trim() });
-        }
-        if (filteredResult.length == 0) {
-            filteredResult = lodash.filter (list, { "id": command.Args.trim() });
-        }
-        
+        let filteredResult = filterToken(command.Args.trim());
 
         if (filteredResult.length > 0) {
             //get token Image
@@ -78,16 +200,25 @@ function commandTokenCheck(command, msg, settings) {
                     `**Total Liquidity:** $${totalLiquidity}\n\n`,
                 Footer: "Values updated every minute"
             };
-            if(imageList.length > 0)  {
-                embedObject.Thumbnail = imageList[0].logoURI; 
+            if (imageList.length > 0) {
+                embedObject.Thumbnail = imageList[0].logoURI;
             }
             runTokenCheck.embed = embedObject;
             runTokenCheck.sendMessage();
 
         } else {
-            msg.reply("Sorry token not found!");
+            msg.reply("Sorry token not found for trade in Pangolin DEX!");
         }
 
+    } else {
+        let embedObject = {
+            Title: 'Token Information Check',
+            Color: Constants.pangoColor,
+            Description: 'Please input a Ticker/Token name or contract address.\n' +
+                'Example: `p!token PNG`'
+        };
+        runTokenCheck.embed = embedObject;
+        runTokenCheck.sendMessage();
     }
 
 

@@ -20,7 +20,8 @@ client.login(settings.tokenid);
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   //Create timer to refresh tokens data
-  retrieveAllTokensData({ client: client, settings: settings });
+  retrieveAllTokensData(client);
+  setInterval(retrieveAllTokensData, settings.refreshTokenList, client);
   console.log('Tokens loaded!');
   retrieveImageList();
 });

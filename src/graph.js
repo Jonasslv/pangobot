@@ -49,7 +49,7 @@ async function retrieveAVAXPrice(){
 
 //TO-DO this query for now has 1000 tokens limit, although it's prioritizing most traded tokens
 //in the future it will need to be upgraded.
-async function retrieveAllTokensData(args) {
+async function retrieveAllTokensData(client) {
     let result = await genericQuery(
         `query {
             tokens(first: 1000, orderBy:  tradeVolumeUSD orderDirection:desc) {
@@ -76,7 +76,7 @@ async function retrieveAllTokensData(args) {
         let orderedResult =  lodash.orderBy(filteredResult,["totalLiquidity", "tradeVolume"], ['desc', 'desc']);
         let tokenPrice = (getAVAXValue() * orderedResult[0].derivedETH).toFixed(2);
 
-        args.client.user.setPresence({
+        client.user.setPresence({
             status: 'online',
             activity: {
                 name: `PNG: $${tokenPrice}`,
@@ -84,7 +84,6 @@ async function retrieveAllTokensData(args) {
             }
         });
     }
-    setTimeout(retrieveAllTokensData, args.settings.refreshTokenList, args);
 }
 
 function getTokenList(){
