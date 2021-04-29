@@ -1,4 +1,4 @@
-const { checkCooldown, makeEmbed, filterToken, DatabaseHandler } = require('./utils.js');
+const { checkCooldown, makeEmbed, filterToken, DatabaseHandler,formatFloat } = require('./utils.js');
 const { CommandRunner } = require('./objects.js');
 const { getAVAXValue } = require('./graph.js');
 const { getMessage, Constants, commandList, TokenImageList } = require('./resources.js');
@@ -114,14 +114,15 @@ function commandAlertCreate(command, msg) {
                             msg.reply("This alert seems duplicated, try again.");
                         } else {
                             let oldPrice = (getAVAXValue() * filteredResult[0].derivedETH);
-                            oldPrice = oldPrice > 0.01 ? oldPrice.toFixed(2) : oldPrice > 0.000001 ? oldPrice.toFixed(6) : oldPrice.toExponential(6);
+                            oldPrice = formatFloat(oldPrice);
                             if (DatabaseHandler.saveObjDatabase('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId, oldPrice:oldPrice })) {
+                                let type = tokenValue > oldPrice  ? "above" : "below"; 
                                 let embedObject = {
                                     Title: 'Token Alert Create',
                                     Color: Constants.pangoColor,
                                     Description: `Alert created successfully for user **${msg.author.username}**.\n\n` +
                                         `**Token**: ${token}\n` +
-                                        `**Price**: $${tokenValue}`
+                                        `**Price ${type}**: $${tokenValue}`
                                 };
                                 if (imageList.length > 0) {
                                     embedObject.Thumbnail = imageList[0].logoURI;
@@ -196,8 +197,7 @@ function commandTokenCheck(command, msg) {
                 Color: Constants.pangoColor,
                 URL: `${Constants.explorerAdress}address/${filteredResult[0].id}`,
                 Description: `**Symbol:** ${filteredResult[0].symbol}\n` +
-                    `**Price:** $${tokenPrice > 0.01 ? tokenPrice.toFixed(2) :
-                        tokenPrice > 0.000001 ? tokenPrice.toFixed(6) : tokenPrice.toExponential(6)}\n` +
+                    `**Price:** $${formatFloat(tokenPrice)}\n` +
                     `**Total Volume:** $${tradeVolume}\n` +
                     `**Total Liquidity:** $${totalLiquidity}\n\n`,
                 Footer: "Values updated every minute"

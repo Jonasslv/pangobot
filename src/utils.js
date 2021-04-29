@@ -52,13 +52,14 @@ async function retrieveImageList() {
 
 function sendDMAlert(user, token, element, tokenPrice) {
     function sendDMChannel(channel){
+        tokenPrice = formatFloat(tokenPrice);
         let imageList = lodash.filter(TokenImageList.getTokenImageList(), { "address": token[0].id.toLowerCase() });
         let embedObject = {
             Title: token[0].name,
             Color: Constants.pangoColor,
             URL: `${Constants.explorerAdress}address/${token[0].id}`,
-            Description: `Token Alert requested by user for price $${element.price}\n` +
-                `ATTENTION: Token: **${token[0].name}** achieved $**${tokenPrice}**, the alert will now be dismissed.`
+            Description: `Token Alert requested by user for price $${element.price}.\n\n` +
+                `**ATTENTION**:\n Token: **${token[0].name}** achieved $**${tokenPrice}**, the alert will now be dismissed.`
         };
         if (imageList.length > 0) {
             embedObject.Thumbnail = imageList[0].logoURI;
@@ -86,7 +87,7 @@ async function checkAlerts(client) {
                     client.users.fetch(element.user).then((user) => {
                         if(user != undefined){
                             sendDMAlert(user, token, element, tokenPrice);
-                            DatabaseHandler.removeObjDatabase('alerts', element);
+                            DatabaseHandler.removeObjDatabase('alerts', {user:element.user,tokenId:element.tokenId,price:element.price});
                         }
                     });
                 }
@@ -95,13 +96,17 @@ async function checkAlerts(client) {
                     client.users.fetch(element.user).then((user) => {
                         if(user != undefined){
                             sendDMAlert(user, token, element, tokenPrice);
-                            DatabaseHandler.removeObjDatabase('alerts', element);
+                            DatabaseHandler.removeObjDatabase('alerts', {user:element.user,tokenId:element.tokenId,price:element.price});
                         }
                     });
                 }
             }
         }
     });
+}
+
+function formatFloat(number){
+    return number > 0.01 ? number.toFixed(2) : number > 0.000001 ? number.toFixed(6) : number.toExponential(6);
 }
 
 //Function for checking if the command is valid
@@ -227,5 +232,6 @@ module.exports = {
     filterToken: filterToken,
     retrieveImageList: retrieveImageList,
     DatabaseHandler: DatabaseHandler,
-    checkAlerts: checkAlerts
+    checkAlerts: checkAlerts,
+    formatFloat:formatFloat
 }
