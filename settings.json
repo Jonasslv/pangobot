@@ -5,7 +5,7 @@
     "twitterChannel":"829130975438569472",
     "twitterAddress":"https://twitter.com/pangolindex",
     "refreshTokenList":60000,
-    "checkForAlerts":15000,
+    "checkForAlerts":30000,
     "cooldownMessage":4000,
     "sendWelcomeDM":"True",
     "pangolinServerID":"707004932821352488"
