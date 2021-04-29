@@ -40,6 +40,7 @@ Server Commands:
 
 # Future possible Commands:
 - Chart command.
+- Top tokens.
 - Command to input a wallet address to show info about all PGL pools of this wallet.
 - Command to show PNG/PGL top wallet addresses.
 - Current Governance proposals and % Votes (There's a way to query this?).
