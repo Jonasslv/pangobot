@@ -59,6 +59,7 @@ module.exports = {
         static pangoColor = 15105570;
         static explorerAdress = 'https://cchain.explorer.avax.network/';
         static pangolinGraphAddress = "https://graph-node.avax.network/subgraphs/name/dasconnor/pangolindex";
+        static PNGContract = "0x60781c2586d68229fde47564546784ab3faca982";
         static USDTAVAXPairContract = "0x9ee0a4e21bd333a6bb2ab298194320b8daa26516";
         static DAIAVAXPairContract = "0x17a2e8275792b4616befb02eb9ae699aa0dcb94b";
         static officialTokenLists = ["https://raw.githubusercontent.com/pangolindex/tokenlists/main/aeb.tokenlist.json",

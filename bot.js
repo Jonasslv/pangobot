@@ -1,7 +1,7 @@
 const { Client } = require('discord.js');
 const { readFileSync } = require('fs');
 const { checkCommand,retrieveImageList,checkAlerts } = require('./src/utils.js');
-const { retrieveAllTokensData } = require('./src/graph.js');
+const { retrieveAllTokensData,retrievePangolinRecentVolume } = require('./src/graph.js');
 const { runCommand, runWelcome } = require('./src/commands.js');
 
 //Create instance of bot.
@@ -21,8 +21,10 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   //Create timer to refresh tokens data
   retrieveAllTokensData(client);
+  retrievePangolinRecentVolume();
   setInterval(retrieveAllTokensData, settings.refreshTokenList, client);
   setInterval(checkAlerts, settings.checkForAlerts, client);
+  setInterval(retrievePangolinRecentVolume,settings.refreshTokenList);
   console.log('Tokens loaded!');
   retrieveImageList();
 });

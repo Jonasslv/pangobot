@@ -1,8 +1,9 @@
 const { checkCooldown, makeEmbed, filterToken, DatabaseHandler,formatFloat } = require('./utils.js');
 const { CommandRunner } = require('./objects.js');
-const { getAVAXValue } = require('./graph.js');
+const { getAVAXValue,getPangolinRecent } = require('./graph.js');
 const { getMessage, Constants, commandList, TokenImageList } = require('./resources.js');
 const lodash = require('lodash');
+const { constant } = require('lodash');
 
 
 function runCommand(command, msg, settings) {
@@ -16,10 +17,31 @@ function runCommand(command, msg, settings) {
                 commandTokenCheck(command, msg);
                 break;
             case 'alert':
-                commandAlertCreate(command, msg);
+                commandAlert(command, msg);
+                break;
+            case 'info':
+                commandInfo(command, msg);
                 break;
         }
     }
+}
+
+function commandInfo(command,msg){
+    runInfo = new CommandRunner(msg);
+    let recentValues = getPangolinRecent();
+    let totalLiquidity = (getAVAXValue()*recentValues.totalLiquidityETH).toFixed(2);
+    let dailyVolume = (getAVAXValue()*recentValues.dailyVolumeETH).toFixed(2);
+    let imageList = lodash.filter(TokenImageList.getTokenImageList(), { "address": Constants.PNGContract.toLowerCase() });
+    let embedObject = {
+        Title: 'Pangolin Status Information',
+        Color: Constants.pangoColor,
+        Description: 'This is the stats for **Pangolin DEX**:\n\n' +
+            `**Total Liquidity:** $${totalLiquidity}\n`+
+            `**Daily Volume:** $${dailyVolume}`,
+        Thumbnail: imageList[0].logoURI
+    };
+    runInfo.embed = embedObject;
+    runInfo.sendMessage();
 }
 
 function runWelcome(settings, member) {
@@ -38,7 +60,7 @@ function runWelcome(settings, member) {
     }
 }
 
-function commandAlertCreate(command, msg) {
+function commandAlert(command, msg) {
     //I accept suggestions to fix this spaghetti (it works tho)
     runAlertCreate = new CommandRunner(msg);
     if (command.Args.trim().length == 0) {

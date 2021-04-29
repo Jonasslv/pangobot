@@ -4,6 +4,7 @@ const { Constants } = require('./resources.js');
 
 var tokenlist;
 var AVAXValue;
+var pangolinRecent;
 
 async function genericQuery(queryObject) {
     let query = await axios({
@@ -86,6 +87,22 @@ async function retrieveAllTokensData(client) {
     }
 }
 
+
+async function retrievePangolinRecentVolume(){
+    let pangoResult = await genericQuery(
+            `query {
+                pangolinDayDatas(orderBy:date,orderDirection:desc,first:1){
+                    totalLiquidityETH
+                    dailyVolumeETH
+                    date
+                }
+            }`
+    );
+    if (pangoResult.data != undefined) {
+        pangolinRecent = pangoResult.data.data.pangolinDayDatas[0];
+    }
+}
+
 function getTokenList(){
     return tokenlist;
 }
@@ -94,8 +111,15 @@ function getAVAXValue(){
     return AVAXValue;
 }
 
+
+function getPangolinRecent(){
+    return pangolinRecent;
+}
+
 module.exports = {
     retrieveAllTokensData: retrieveAllTokensData,
     getTokenList:getTokenList,
-    getAVAXValue:getAVAXValue
+    getAVAXValue:getAVAXValue,
+    retrievePangolinRecentVolume:retrievePangolinRecentVolume,
+    getPangolinRecent:getPangolinRecent
 };
