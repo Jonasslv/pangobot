@@ -37,7 +37,7 @@ function commandApy(command,msg){
         let strPools = ``;
         let totalValue = 0;
         pools.forEach((element) =>{
-            totalValue += element.staked_tvl.toFixed(2);
+            totalValue += Number(element.staked_tvl);
             strPools += `**${element.stakeTokenTicker}**\n`+
                         `**TVL:** $${element.staked_tvl.toFixed(2)}\n`+
                         `**APR D**:${element.dailyAPR.toFixed(2)}% **W**:${element.weeklyAPR.toFixed(2)}% **Y**:${element.yearlyAPR.toFixed(2)}%\n\n`
@@ -47,7 +47,7 @@ function commandApy(command,msg){
             Color: Constants.pangoColor,
             Description: '**PNG** Farming Pools ordered by APY% :farmer: :woman_farmer: :\n\n' +
                 strPools+
-                `**All Pools Value: $${totalValue}**`
+                `**All Pools Value: $${totalValue.toFixed(2)}**`
         };
         runApy.embed = embedObject;
         runApy.sendMessage();
