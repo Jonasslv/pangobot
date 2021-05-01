@@ -38,8 +38,8 @@ function commandApy(command,msg){
         let totalValue = 0;
         pools.forEach((element) =>{
             totalValue += element.staked_tvl.toFixed(2);
-            strPools += `**[${element.stakeTokenTicker}]**\n`+
-                        `**Total Value Locked:** $${element.staked_tvl.toFixed(2)}\n`+
+            strPools += `**${element.stakeTokenTicker}**\n`+
+                        `**TVL:** $${element.staked_tvl.toFixed(2)}\n`+
                         `**APR D**:${element.dailyAPR.toFixed(2)}% **W**:${element.weeklyAPR.toFixed(2)}% **Y**:${element.yearlyAPR.toFixed(2)}%\n\n`
         });
         let embedObject = {
