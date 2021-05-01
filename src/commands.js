@@ -35,7 +35,9 @@ function commandApy(command,msg){
     pools = lodash.orderBy(pools,["yearlyAPR"], ['desc']);
     if(pools.length > 0){
         let strPools = ``;
+        let totalValue = 0;
         pools.forEach((element) =>{
+            totalValue += element.staked_tvl.toFixed(2);
             strPools += `**[${element.stakeTokenTicker}]**\n`+
                         `**Total Value Locked:** $${element.staked_tvl.toFixed(2)}\n`+
                         `**APR D**:${element.dailyAPR.toFixed(2)}% **W**:${element.weeklyAPR.toFixed(2)}% **Y**:${element.yearlyAPR.toFixed(2)}%\n\n`
@@ -44,7 +46,8 @@ function commandApy(command,msg){
             Title: 'Pangolin Top APY List',
             Color: Constants.pangoColor,
             Description: '**PNG** Farming Pools ordered by APY% :farmer: :woman_farmer: :\n\n' +
-                strPools
+                strPools+
+                `**All Pools Value: $${totalValue}**`
         };
         runApy.embed = embedObject;
         runApy.sendMessage();
