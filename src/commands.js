@@ -2,6 +2,7 @@ const { checkCooldown, makeEmbed, filterToken, DatabaseHandler,formatFloat } = r
 const { CommandRunner } = require('./objects.js');
 const { getAVAXValue,getPangolinRecent } = require('./graph.js');
 const { getMessage, Constants, commandList, TokenImageList } = require('./resources.js');
+const { getPoolsInfo } = require('./abicalls.js');
 const lodash = require('lodash');
 
 
@@ -21,7 +22,34 @@ function runCommand(command, msg, settings) {
             case 'info':
                 commandInfo(command, msg);
                 break;
+            case 'apy':
+                commandApy(command, msg);
+                break;
         }
+    }
+}
+
+function commandApy(command,msg){
+    runApy = new CommandRunner(msg);
+    let pools = getPoolsInfo();
+    pools = lodash.orderBy(pools,["yearlyAPR"], ['desc']);
+    if(pools.length > 0){
+        let strPools = ``;
+        pools.forEach((element) =>{
+            strPools += `**[${element.stakeTokenTicker}]**\n`+
+                        `**Total Value Locked:** $${element.staked_tvl.toFixed(2)}\n`+
+                        `**APR D**:${element.dailyAPR.toFixed(2)}% **W**:${element.weeklyAPR.toFixed(2)}% **Y**:${element.yearlyAPR.toFixed(2)}%\n\n`
+        });
+        let embedObject = {
+            Title: 'Pangolin Top APY List',
+            Color: Constants.pangoColor,
+            Description: '**PNG** Farming Pools ordered by APY% :farmer: :woman_farmer: :\n\n' +
+                strPools
+        };
+        runApy.embed = embedObject;
+        runApy.sendMessage();
+    }else{
+        msg.reply('Sorry no data has been found.')
     }
 }
 

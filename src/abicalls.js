@@ -7,7 +7,6 @@ const { filterToken } = require('./utils.js');
 const { Constants } = require('./resources.js');
 
 var individualAPRs = [];
-var provider = new ethers.providers.JsonRpcProvider('https://api.avax.network/ext/bc/C/rpc');
 
 const avaxTokens = [
     { "id": "avalanche", "symbol": "AVAX", "contract": "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7" },
@@ -81,9 +80,11 @@ const PngStakingContracts = [
         stakingRewardAddress: '0xc7D0E29b616B29aC6fF4FD5f37c8Da826D16DB0D'
     },
 ]
+var provider = undefined;
 
 async function generateFarmingPoolsData() {
-
+    type = [];
+    provider = new ethers.providers.JsonRpcProvider('https://api.avax.network/ext/bc/C/rpc');
     const tokens = {};
     const prices = await getAvaxPrices();
 
@@ -98,11 +99,15 @@ async function generateFarmingPoolsData() {
     await loadMultiplePangolinPools(tokens, prices, pools);
 }
 
-module.exports = { generateFarmingPoolsData };
+function getPoolsInfo(){
+    return individualAPRs;
+}
+
+module.exports = { generateFarmingPoolsData,getPoolsInfo };
 
 
 async function loadMultiplePangolinPools(tokens, prices, pools) {
-    individualAPRs = [];
+    let APRs = [];
     const infos = await Promise.all(pools.map(p =>
         loadPangolinPoolInfo(tokens, prices, p.abi, p.address, p.rewardTokenFunction, p.stakeTokenFunction)));
     for (const i of infos) {
@@ -112,8 +117,9 @@ async function loadMultiplePangolinPools(tokens, prices, pools) {
         i.weeklyAPR = weeklyAPR;
         i.dailyAPR = dailyAPR;
         i.yearlyAPR = yearlyAPR;
-        individualAPRs.push(i);
+        APRs.push(i);
     };
+    individualAPRs = APRs;
 }
 
 async function loadPangolinPoolInfo(tokens, prices, stakingAbi, stakingAddress,
@@ -229,8 +235,7 @@ function getPangoPrices(tokens, prices, pool) {
     var price = tvl / pool.totalSupply;
     prices[pool.address] = { usd: price };
     var staked_tvl = pool.staked * price;
-    let stakeTokenTicker = `[${t0.symbol}]-[${t1.symbol}]`;
-    stakeTokenTicker += " PGL";
+    let stakeTokenTicker = `${t0.symbol}/${t1.symbol}`;
     return {
         t0: t0,
         p0: p0,
@@ -263,8 +268,10 @@ const lookUpTokenPrices = async function (id_array) {
     for (const id_chunk of chunk(id_array, 50)) {
         ids = id_chunk.join('%2C');
         let AVAXValue = getAVAXValue();
-        let token = filterToken(ids.toLowerCase());
-        tokenValue = (token[0].derivedETH*AVAXValue).toFixed(2);
+        let token = filterToken(ids);
+        if(token != undefined){
+            tokenValue = (token[0].derivedETH*AVAXValue).toFixed(2);
+        }
     }
     const prices = {[ids]:{usd:tokenValue}};
     return prices;
@@ -353,7 +360,6 @@ async function getAvaxToken(tokenAddress) {
     }
     try {
         const VAULT = new ethers.Contract(tokenAddress, BSC_VAULT_ABI, provider);
-        const _token = await VAULT.token();
         const vault = await getAvaxVault(VAULT, tokenAddress);
         if (type.length == 0) {
             type.push({ tokenAddress: tokenAddress, type: "vault" });
@@ -424,6 +430,9 @@ const chunk = (arr, n) => arr.length ? [arr.slice(0, n), ...chunk(arr.slice(n), 
 const lookUpPrices = async function (id_array) {
     let AVAXValue = getAVAXValue();
     let PNGToken = filterToken(Constants.PNGContract);
-    let PNGValue = (PNGToken[0].derivedETH*AVAXValue).toFixed(2);
+    let PNGValue = 0;
+    if(PNGToken != undefined){
+        PNGValue = (PNGToken[0].derivedETH*AVAXValue).toFixed(2);
+    }
     return {avalanche:{usd:(AVAXValue).toFixed(2)},pangolin:{usd:PNGValue}};
 }

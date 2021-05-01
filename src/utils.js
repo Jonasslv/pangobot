@@ -38,7 +38,6 @@ async function retrieveImageList() {
                     (JSON.parse(body)).tokens.forEach((element2) => {
                         TokenImageList.appendTokenImageList({ address: element2.address.toLowerCase(), logoURI: element2.logoURI });
                     });
-                    console.log("Loaded image list.");
                 } catch (error) {
                     console.error(error.message);
                 };
@@ -151,7 +150,7 @@ function filterToken(args) {
         filteredResult = lodash.filter(list, { "name": args });
     }
     if (filteredResult.length == 0) {
-        filteredResult = lodash.filter(list, { "id": args });
+        filteredResult = lodash.filter(list,function(o) { return o.id.toLowerCase() == args.toLowerCase(); });
     }
 
     return filteredResult;

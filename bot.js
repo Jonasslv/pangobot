@@ -23,12 +23,13 @@ client.on('ready', async () => {
   //Create timer to refresh tokens data
   await retrieveAllTokensData(client);
   await retrievePangolinRecentVolume();
+  await generateFarmingPoolsData();
+  await retrieveImageList();
   setInterval(retrieveAllTokensData, settings.refreshTokenList, client);
   setInterval(checkAlerts, settings.checkForAlerts, client);
   setInterval(retrievePangolinRecentVolume,settings.refreshTokenList);
+  setInterval(generateFarmingPoolsData,18000000); //30 minutes to refresh apy to not spam ABI calls
   console.log('Tokens loaded!');
-  await retrieveImageList();
-  generateFarmingPoolsData();
 });
 
 client.on('guildMemberAdd', member => {
