@@ -3,7 +3,6 @@ const { CommandRunner } = require('./objects.js');
 const { getAVAXValue,getPangolinRecent } = require('./graph.js');
 const { getMessage, Constants, commandList, TokenImageList } = require('./resources.js');
 const lodash = require('lodash');
-const { constant } = require('lodash');
 
 
 function runCommand(command, msg, settings) {

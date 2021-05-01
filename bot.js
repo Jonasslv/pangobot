@@ -3,6 +3,7 @@ const { readFileSync } = require('fs');
 const { checkCommand,retrieveImageList,checkAlerts } = require('./src/utils.js');
 const { retrieveAllTokensData,retrievePangolinRecentVolume } = require('./src/graph.js');
 const { runCommand, runWelcome } = require('./src/commands.js');
+const {generateFarmingPoolsData} = require('./src/abicalls.js')
 
 //Create instance of bot.
 const client = new Client();
@@ -17,16 +18,17 @@ const botPrefix = settings.botprefix;
 client.login(settings.tokenid);
 
 
-client.on('ready', () => {
+client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
   //Create timer to refresh tokens data
-  retrieveAllTokensData(client);
-  retrievePangolinRecentVolume();
+  await retrieveAllTokensData(client);
+  await retrievePangolinRecentVolume();
   setInterval(retrieveAllTokensData, settings.refreshTokenList, client);
   setInterval(checkAlerts, settings.checkForAlerts, client);
   setInterval(retrievePangolinRecentVolume,settings.refreshTokenList);
   console.log('Tokens loaded!');
-  retrieveImageList();
+  await retrieveImageList();
+  generateFarmingPoolsData();
 });
 
 client.on('guildMemberAdd', member => {
