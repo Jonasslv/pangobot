@@ -24,8 +24,8 @@ Server Commands:
   - What's Pangolin (p!help pangolin)
   - Links    (p!help links) (Link to pangolin exchange, analytics, forum and official discord invite). Useful for using the bot in other discord servers.
 
-- APY (Input Pool). Shows the current APY of PNG Staking Pool and how much each token of the pool costs.
-  - p!apy AVAX/PNG
+- APY. Shows top APY pools.
+  - p!apy
 
 - Token check (Input Ticker/Token Name). Shows the current price for ticker/Token, Liquidity and 24h Volume
   - p!token PNG / p!token Pangolin
