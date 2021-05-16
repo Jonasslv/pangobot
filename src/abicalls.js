@@ -23,62 +23,68 @@ const ERC20_ABI = [{ "constant": true, "inputs": [], "name": "name", "outputs": 
 
 const PngStakingContracts = [
     {
-        stakingRewardAddress: '0x417C02150b9a31BcaCb201d1D60967653384E1C6'
+        stakingRewardAddress: '0x417C02150b9a31BcaCb201d1D60967653384E1C6'  //avax-ether
     },
     {
-        stakingRewardAddress: '0xe968E9753fd2c323C2Fe94caFF954a48aFc18546'
+        stakingRewardAddress: '0xe968E9753fd2c323C2Fe94caFF954a48aFc18546'  //avax-wbtc
     },
     {
-        stakingRewardAddress: '0xBDa623cDD04d822616A263BF4EdbBCe0B7DC4AE7'
+        stakingRewardAddress: '0xBDa623cDD04d822616A263BF4EdbBCe0B7DC4AE7'  //avax-link
     },
     {
-        stakingRewardAddress: '0x574d3245e36Cf8C9dc86430EaDb0fDB2F385F829'
+        stakingRewardAddress: '0x574d3245e36Cf8C9dc86430EaDb0fDB2F385F829'  //PNG-AVAX   
     },
     {
-        stakingRewardAddress: '0x94C021845EfE237163831DAC39448cFD371279d6'
+        stakingRewardAddress: '0x94C021845EfE237163831DAC39448cFD371279d6'  //AVAX-USDT
     },
     {
-        stakingRewardAddress: '0xDA354352b03f87F84315eEF20cdD83c49f7E812e'
+        stakingRewardAddress: '0xDA354352b03f87F84315eEF20cdD83c49f7E812e'  //AVAX-SUSHI
     },
     {
-        stakingRewardAddress: '0x701e03fAD691799a8905043C0d18d2213BbCf2c7'
+        stakingRewardAddress: '0x701e03fAD691799a8905043C0d18d2213BbCf2c7'  //AVAX-DAI
     },
     {
-        stakingRewardAddress: '0x4dF32F1F8469648e89E62789F4246f73fe768b8E'
+        stakingRewardAddress: '0x4dF32F1F8469648e89E62789F4246f73fe768b8E'  //AVAX-AAVE
     },
     {
-        stakingRewardAddress: '0x1F6aCc5F5fE6Af91C1BB3bEbd27f4807a243D935'
+        stakingRewardAddress: '0x1F6aCc5F5fE6Af91C1BB3bEbd27f4807a243D935'  //AVAX-UNI 
     },
     {
-        stakingRewardAddress: '0x2C31822F35506C6444F458Ed7470c79f9924Ee86'
+        stakingRewardAddress: '0x2C31822F35506C6444F458Ed7470c79f9924Ee86' //AVAX-YFI
     },
     {
-        stakingRewardAddress: '0x7ac007afB5d61F48D1E3C8Cc130d4cf6b765000e'
+        stakingRewardAddress: '0x7ac007afB5d61F48D1E3C8Cc130d4cf6b765000e' //PNG-ETH 
     },
     {
-        stakingRewardAddress: '0x681047473B6145BA5dB90b074E32861549e85cC7'
+        stakingRewardAddress: '0x681047473B6145BA5dB90b074E32861549e85cC7' //PNG-WBTC  
     },
     {
-        stakingRewardAddress: '0x6356b24b36074AbE2903f44fE4019bc5864FDe36'
+        stakingRewardAddress: '0x6356b24b36074AbE2903f44fE4019bc5864FDe36' //PNG-LINK 
     },
     {
-        stakingRewardAddress: '0xE2510a1fCCCde8d2D1c40b41e8f71fB1F47E5bBA'
+        stakingRewardAddress: '0xE2510a1fCCCde8d2D1c40b41e8f71fB1F47E5bBA'  //PNG-USDT
     },
     {
-        stakingRewardAddress: '0x633F4b4DB7dD4fa066Bd9949Ab627a551E0ecd32'
+        stakingRewardAddress: '0x633F4b4DB7dD4fa066Bd9949Ab627a551E0ecd32'  //PNG-SUSHI 
     },
     {
-        stakingRewardAddress: '0xe3103e565cF96a5709aE8e603B1EfB7fED04613B'
+        stakingRewardAddress: '0xe3103e565cF96a5709aE8e603B1EfB7fED04613B'  //PNG-DAI
     },
     {
-        stakingRewardAddress: '0xFd9ACEc0F413cA05d5AD5b962F3B4De40018AD87'
+        stakingRewardAddress: '0xFd9ACEc0F413cA05d5AD5b962F3B4De40018AD87'  //PNG-AAVE
     },
     {
-        stakingRewardAddress: '0x4f74BbF6859A994e7c309eA0f11E3Cc112955110'
+        stakingRewardAddress: '0x4f74BbF6859A994e7c309eA0f11E3Cc112955110'  //PNG-UNI
     },
     {
-        stakingRewardAddress: '0xc7D0E29b616B29aC6fF4FD5f37c8Da826D16DB0D'
+        stakingRewardAddress: '0xc7D0E29b616B29aC6fF4FD5f37c8Da826D16DB0D'  //PNG-YFI
     },
+    {
+        stakingRewardAddress: '0x08B9A023e34Bad6Db868B699fa642Bf5f12Ebe76'  //PNG-SNOB
+    },
+    {
+        stakingRewardAddress: '0x640D754113A3CBDd80BcCc1b5c0387148EEbf2fE'  //AVAX-SNOB
+    }
 ]
 var provider = undefined;
 
@@ -314,7 +320,6 @@ async function getAvaxStoredToken(tokenAddress, type) {
             return await getAvaxVault(vault, tokenAddress);
     }
 }
-
 
 async function getAvaxVault(vault, address) {
     const decimals = await vault.decimals();
