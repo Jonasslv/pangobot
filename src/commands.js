@@ -1,4 +1,4 @@
-const { checkCooldown, makeEmbed, filterToken, DatabaseHandler,formatFloat } = require('./utils.js');
+const { checkCooldown, makeEmbed, filterToken, DatabaseHandler,formatCurrency } = require('./utils.js');
 const { CommandRunner } = require('./objects.js');
 const { getAVAXValue,getPangolinRecent } = require('./graph.js');
 const { getMessage, Constants, commandList, TokenImageList } = require('./resources.js');
@@ -59,15 +59,15 @@ function commandApy(command,msg){
 function commandInfo(command,msg){
     runInfo = new CommandRunner(msg);
     let recentValues = getPangolinRecent();
-    let totalLiquidity = (getAVAXValue()*recentValues.totalLiquidityETH).toFixed(2);
-    let dailyVolume = (getAVAXValue()*recentValues.dailyVolumeETH).toFixed(2);
+    let totalLiquidity = formatCurrency((getAVAXValue()*recentValues.totalLiquidityETH));
+    let dailyVolume = formatCurrency((getAVAXValue()*recentValues.dailyVolumeETH));
     let imageList = lodash.filter(TokenImageList.getTokenImageList(), { "address": Constants.PNGContract.toLowerCase() });
     let embedObject = {
         Title: 'Pangolin Status Information',
         Color: Constants.pangoColor,
         Description: 'This is the stats for **Pangolin DEX**:\n\n' +
-            `**Total Liquidity:** $${totalLiquidity}\n`+
-            `**Daily Volume:** $${dailyVolume}`,
+            `**Total Liquidity:** ${totalLiquidity}\n`+
+            `**Daily Volume:** ${dailyVolume}`,
         Thumbnail: imageList[0].logoURI
     };
     runInfo.embed = embedObject;
@@ -166,7 +166,7 @@ function commandAlert(command, msg) {
                             msg.reply("This alert seems duplicated, try again.");
                         } else {
                             let oldPrice = (getAVAXValue() * filteredResult[0].derivedETH);
-                            oldPrice = formatFloat(oldPrice);
+                            oldPrice = formatCurrency(oldPrice);
                             if (DatabaseHandler.saveObjDatabase('alerts', { user: msg.author.id, price: tokenValue, tokenId: tokenId, oldPrice:oldPrice })) {
                                 let type = tokenValue > oldPrice  ? "above" : "below"; 
                                 let embedObject = {
@@ -249,9 +249,9 @@ function commandTokenCheck(command, msg) {
                 Color: Constants.pangoColor,
                 URL: `${Constants.explorerAdress}address/${filteredResult[0].id}`,
                 Description: `**Symbol:** ${filteredResult[0].symbol}\n` +
-                    `**Price:** $${formatFloat(tokenPrice)}\n` +
-                    `**Total Volume:** $${tradeVolume}\n` +
-                    `**Total Liquidity:** $${totalLiquidity}\n\n`,
+                    `**Price:** ${formatCurrency(tokenPrice)}\n` +
+                    `**Total Volume:** ${formatCurrency(tradeVolume)}\n` +
+                    `**Total Liquidity:** ${formatCurrency(totalLiquidity)}\n\n`,
                 Footer: "Values updated every minute"
             };
             if (imageList.length > 0) {

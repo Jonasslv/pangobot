@@ -1,4 +1,5 @@
 const { commandList, Constants, TokenImageList } = require('./resources.js');
+const StringMask = require('string-mask');
 const { MessageEmbed } = require('discord.js');
 const { getTokenList, getAVAXValue } = require('./graph.js');
 const https = require('https');
@@ -104,9 +105,21 @@ async function checkAlerts(client) {
     });
 }
 
-function formatFloat(number){
-    return number > 0.01 ? number.toFixed(2) : number > 0.000001 ? number.toFixed(6) : number.toExponential(6);
+function prettyFormat(nb) {
+    nb = nb * 1;
+    nb = nb.toFixed(2);
+    var formatter = new StringMask('#.##0,00', { reverse: true });
+    nb = (nb.toString()).replace(/\D/g, ""); //get rid of the formatting
+    return formatter.apply(nb);
 }
+
+function formatCurrency(nb) {
+
+    let value = nb > 0.01 ? prettyFormat(nb) : nb > 0.000001 ? Number(nb).toFixed(6) : Number(nb).toExponential(6);
+
+    return `$${value}`;
+}
+
 
 //Function for checking if the command is valid
 function checkCommand(str) {
@@ -232,5 +245,5 @@ module.exports = {
     retrieveImageList: retrieveImageList,
     DatabaseHandler: DatabaseHandler,
     checkAlerts: checkAlerts,
-    formatFloat:formatFloat
+    formatCurrency:formatCurrency
 }
