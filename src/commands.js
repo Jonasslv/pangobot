@@ -40,7 +40,7 @@ function commandApy(command,msg){
             totalValue += Number(element.staked_tvl);
             strPools += `**${element.stakeTokenTicker}**\n`+
                         `**TVL:**  ${formatCurrency(element.staked_tvl)}\n`+
-                        `**APR **Y**:${element.yearlyAPR.toFixed(2)}%\n\n`
+                        `**APR Y**:${element.yearlyAPR.toFixed(2)}%\n\n`
         });
         let embedObject = {
             Title: 'Pangolin Top APY List',
