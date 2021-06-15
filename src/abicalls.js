@@ -86,11 +86,17 @@ const PngStakingContracts = [
         stakingRewardAddress: '0x640D754113A3CBDd80BcCc1b5c0387148EEbf2fE'  //AVAX-SNOB
     },
     {
-        stakingRewardAddress: '0x12A33F6B0dd0D35279D402aB61587fE7eB23f7b0'
+        stakingRewardAddress: '0x12A33F6B0dd0D35279D402aB61587fE7eB23f7b0' //PNG-SPORE
     },
     {
-        stakingRewardAddress: '0xd3e5538A049FcFcb8dF559B85B352302fEfB8d7C'
-    }  
+        stakingRewardAddress: '0xd3e5538A049FcFcb8dF559B85B352302fEfB8d7C' //AVAX-SPORE
+    },
+    {
+        stakingRewardAddress: '0x759ee0072901f409e4959E00b00a16FD729397eC' //PNG-VSO 
+    },
+    {
+        stakingRewardAddress: '0xf2b788085592380bfCAc40Ac5E0d10D9d0b54eEe' //AVAX-VSO
+    }      
 ]
 var provider = undefined;
 
