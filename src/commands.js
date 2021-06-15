@@ -39,7 +39,7 @@ function commandApy(command,msg){
         pools.forEach((element) =>{
             totalValue += Number(element.staked_tvl);
             strPools += `**${element.stakeTokenTicker}**\n`+
-                        `**TVL:** $${element.staked_tvl.toFixed(2)}\n`+
+                        `**TVL:**  ${formatCurrency(element.staked_tvl)}\n`+
                         `**APR D**:${element.dailyAPR.toFixed(2)}% **W**:${element.weeklyAPR.toFixed(2)}% **Y**:${element.yearlyAPR.toFixed(2)}%\n\n`
         });
         let embedObject = {
@@ -47,7 +47,7 @@ function commandApy(command,msg){
             Color: Constants.pangoColor,
             Description: '**PNG** Farming Pools ordered by APY% :farmer: :woman_farmer: :\n\n' +
                 strPools+
-                `**All Pools Value: $${totalValue.toFixed(2)}**`
+                `**All Pools Value: ${formatCurrency(totalValue)}**`
         };
         runApy.embed = embedObject;
         runApy.sendMessage();
