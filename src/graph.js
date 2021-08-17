@@ -26,7 +26,7 @@ async function genericQuery(queryObject) {
 
 //Get AVAX Price from the USDT Pair
 async function retrieveAVAXPrice(){
-    let USDTPrice = await genericQuery(
+    let USDTQuery = await genericQuery(
         `query {
             pair(id: \"${Constants.USDTAVAXPairContract}\") {
                 token1Price
@@ -34,7 +34,7 @@ async function retrieveAVAXPrice(){
         }`
     );
 
-    let DAIPrice = await genericQuery(
+    let DAIQuery = await genericQuery(
         `query {
             pair(id: \"${Constants.DAIAVAXPairContract}\") {
                 token1Price
