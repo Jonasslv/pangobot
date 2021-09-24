@@ -76,7 +76,7 @@ async function refreshPNGData(client) {
   const tokenPrice = (getAVAXValue() * orderedResult[0].derivedETH).toFixed(2);
   console.log(await getPNGCircSupply());
   const pngTotalSupply = await getPNGCircSupply();
-  const mcap = `Total Mcap $${((tokenPrice * pngTotalSupply)/1_000_000).toFixed(2)}M`;
+  const mcap = `Circ Mcap $${((tokenPrice * pngTotalSupply)/1_000_000).toFixed(2)}M`;
 
 
   let relevantInformation;
