@@ -19,12 +19,6 @@ function runCommand(command, msg, settings) {
             case 'alert':
                 commandAlert(command, msg);
                 break;
-            case 'info':
-                commandInfo(command, msg);
-                break;
-            case 'apy':
-                commandApy(command, msg);
-                break;
         }
     }
 }

@@ -4,7 +4,6 @@ const lodash = require('lodash');
 const { checkCommand,retrieveImageList,checkAlerts } = require('./src/utils.js');
 const { retrieveAllTokensData,retrievePangolinRecentVolume, getPNGCircSupply, getTokenList, getAVAXValue } = require('./src/graph.js');
 const { runCommand, runWelcome } = require('./src/commands.js');
-const {generateFarmingPoolsData} = require('./src/abicalls.js')
 
 //Create instance of bot.
 const client = new Client();
@@ -32,13 +31,11 @@ client.on('ready', async () => {
     await refreshPNGData(client);
   });
   await retrievePangolinRecentVolume();
-  await generateFarmingPoolsData();
   await retrieveImageList();
   setInterval(retrieveAllTokensData, settings.refreshTokenList, client);
   setInterval(checkAlerts, settings.checkForAlerts, client);
   setInterval(retrievePangolinRecentVolume,settings.refreshTokenList);
   setInterval(refreshPNGData,settings.refreshTokenList+30000,client);
-  setInterval(generateFarmingPoolsData,18000000); //30 minutes to refresh apy to not spam ABI calls
   console.log('Tokens loaded!');
 });
 
@@ -74,7 +71,6 @@ async function refreshPNGData(client) {
   const filteredResult = lodash.filter(getTokenList(), { "symbol": "PNG" });
   const orderedResult = lodash.orderBy(filteredResult, ["totalLiquidity", "tradeVolume"], ['desc', 'desc']);
   const tokenPrice = (getAVAXValue() * orderedResult[0].derivedETH).toFixed(2);
-  console.log(await getPNGCircSupply());
   const pngTotalSupply = await getPNGCircSupply();
   const mcap = `Circ Mcap $${((tokenPrice * pngTotalSupply)/1_000_000).toFixed(2)}M`;
 

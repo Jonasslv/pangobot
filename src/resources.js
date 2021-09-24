@@ -45,7 +45,7 @@ function getMessage(messageName) {
 var tokenImageList;
 
 module.exports = {
-  commandList: [] = ['help', 'apy', 'info', 'token', 'alert'],
+  commandList: [] = ['help', 'token', 'alert'],
   getMessage: getMessage,
   TokenImageList: class {
     static getTokenImageList() {
